@@ -1,3 +1,5 @@
+require('dotenv').config()
+
 const { createBot, createProvider, createFlow, addKeyword } = require('@bot-whatsapp/bot')
 
 const QRPortalWeb = require('@bot-whatsapp/portal')
@@ -5,10 +7,15 @@ const WebWhatsappProvider = require('@bot-whatsapp/provider/web-whatsapp')
 const MongoAdapter = require('@bot-whatsapp/database/mongo')
 
 /**
+ * Se agrega chatGPClass para tener lenguaje natural
+ */
+const chatGPTClass = require('./GPT/ChatGPTClass')
+const chatGPT = new chatGPTClass()
+
+/**
  * Declaramos las conexiones de Mongo
  */
-
-const MONGO_DB_URI = 'mongodb://0.0.0.0:27017'
+const MONGO_DB_URI = 'mongodb+srv://Grupo3:123321@cluster0.xfox8rn.mongodb.net/ChatBot?retryWrites=true&w=majority'
 const MONGO_DB_NAME = 'db_bot'
 
 /**
@@ -67,8 +74,8 @@ const flowDiscord = addKeyword(['discord']).addAnswer(
     [flowSecundario]
 )
 
-const flowPrincipal = addKeyword(['hola', 'ole', 'alo'])
-    .addAnswer('🙌 Hola bienvenido a este *Chatbot*')
+const flowPrincipal = addKeyword(['hola', 'ole', 'alo', 'hi', 'buenas'])
+    .addAnswer('🙌 Hola bienvenido a este *Chatbot*, en el que podrás comprar sin salir de casa.')
     .addAnswer(
         [
             'te comparto los siguientes links de interes sobre el proyecto',
@@ -80,6 +87,9 @@ const flowPrincipal = addKeyword(['hola', 'ole', 'alo'])
         null,
         [flowDocs, flowGracias, flowTuto, flowDiscord]
     )
+
+//Me traigo el flow de FlowChatGPT
+const { FlowChatGPT } = require('./GPT/FlowChatGPT')
 
 const main = async () => {
     const adapterDB = new MongoAdapter({
